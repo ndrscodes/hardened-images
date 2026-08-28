@@ -1,4 +1,8 @@
-CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+if [ -z "$TARGETS" ] || [ "$TARGETS" = "all" ]; then
+    CHANGED_FILES=$(find . -name Dockerfile)
+else
+    CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+fi
 
 DIRS=()
 for file in $CHANGED_FILES; do
