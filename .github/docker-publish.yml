@@ -1,0 +1,159 @@
+name: Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Detect Changed Image Directories
+        id: set-matrix
+        run: |
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+      
+          DIRS=()
+          for file in $CHANGED_FILES; do
+            DIR=$(echo "$file" | cut -d'/' -f1)
+            if [ -d "$DIR" ] && [ -f "$DIR/Dockerfile" ]; then
+              DIRS+=("$DIR")
+            fi
+          done
+      
+          if [ ${#DIRS[@]} -eq 0 ]; then
+            JSON_ARRAY="[]"
+          else
+            JSON_ARRAY=$(printf '"%s"\n' "${DIRS[@]}" | sort -u | uniq | jq -s -c .)
+          fi
+
+          echo "changed images detected: $JSON_ARRAY"
+          echo "images=$JSON_ARRAY" >> $GITHUB_OUTPUT
+  build:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.images != '[]' && needs.detect-changes.outputs.images != '' }}
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.detect-changes.outputs.images) }}
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install the cosign tool except on PR
+      # https://github.com/sigstore/cosign-installer
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
+        with:
+          cosign-release: 'v2.2.4'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect Changed Image Directories
+        id: set-matrix
+        run: |
+          CHANGED=$(.github/cicd/detect-changed-images.sh)
+          echo "detected changes: $CHANGED"
+          echo "images=$CHANGED" >> $GITHUB_OUTPUT
+      - name: Calculate Tag for ${{ matrix.image }}
+        id: tag
+        run: |
+          IMAGE_DIR="${{ matrix.image }}"
+          DOCKERFILE="${IMAGE_DIR}/Dockerfile"
+
+          UPSTREAM_VER=$(grep -w -E "(FROM )|(COPY --from=)[a-zA-Z0-9/.]*$IMAGE_DIR:\S*" $IMAGE_DIR/Dockerfile | head -n 1 | sed -E 's/.*:([a-zA-Z0-9\._-]+)(@.+)?/\1/g')
+          [[ "$UPSTREAM_VER" =~ ^v ]] || UPSTREAM_VER="v${UPSTREAM_VER}"
+
+          # Look up highest revision for this specific image prefix
+          GIT_PREFIX="${IMAGE_DIR}/${UPSTREAM_VER}"
+          LATEST_TAG=$(git tag -l "${GIT_PREFIX}-r*" | sort -V | tail -n 1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_REV="1"
+          else
+            CURRENT_REV=$(echo "$LATEST_TAG" | sed -E 's/.*-r([0-9]+)$/\1/')
+            NEW_REV=$((CURRENT_REV + 1))
+          fi
+
+          echo "GIT_TAG=${GIT_PREFIX}-r${NEW_REV}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${UPSTREAM_VER}-r${NEW_REV}" >> $GITHUB_ENV
+          echo "VERSION_ALIAS=${UPSTREAM_VER}" >> $GITHUB_ENV
+          echo "MINOR_ALIAS=$(echo $UPSTREAM_VER | sed -E 's/(v?[0-9]+\.[0-9]+).*/\1/g')" >> $GITHUB_ENV
+
+      - name: Create Git Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${GIT_TAG}" -m "Release ${GIT_TAG}"
+          git push origin "${GIT_TAG}"
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/ndrscodes/hardened-images/${{ matrix.image }}
+          labels: |
+            org.opencontainers.image.title=${{ matrix.image }}
+            org.opencontainers.image.source=https://github.com/ndrscodes/hardened-images
+          tags: |
+            type=raw,value=${{ env.IMAGE_TAG }}
+            type=raw,value=${{ env.VERSION_ALIAS }}
+            type=raw,value=${{ env.MINOR_ALIAS }}
+            type=raw,value=latest
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Sign the resulting Docker image digest except on PRs.
+      # This will only write to the public Rekor transparency log when the Docker
+      # repository is public to avoid leaking data.  If you would like to publish
+      # transparency data even for private images, pass --force to cosign below.
+      # https://github.com/sigstore/cosign
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
