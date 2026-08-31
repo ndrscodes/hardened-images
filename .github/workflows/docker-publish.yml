@@ -21,6 +21,8 @@ jobs:
       contents: read
     outputs:
       images: ${{ steps.set-matrix.outputs.images }}
+    env:
+      TARGET: ${{ inputs.target }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
