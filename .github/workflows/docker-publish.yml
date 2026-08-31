@@ -71,7 +71,7 @@ jobs:
         id: tag
         env:
           MATRIX_IMAGE: ${{ matrix.image }}
-        run: .github/cicd/calculate_tags.sh
+        run: .github/cicd/calculate-tags.sh
 
       - name: Create Git Tag
         run: |
