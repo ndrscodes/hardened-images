@@ -10,7 +10,6 @@ on:
       target:
         required: false
         type: string
-        default: 'all'
 
 env:
   REGISTRY: ghcr.io
