@@ -93,6 +93,7 @@ jobs:
           labels: |
             org.opencontainers.image.title=${{ matrix.image }}
             org.opencontainers.image.source=https://github.com/ndrscodes/hardened-images
+            org.opencontainers.image.description="a hardened version of ${{ matrix.image }} with up-to-date base images and security best-practices"
           tags: |
             type=raw,value=${{ env.IMAGE_TAG }}
             type=raw,value=${{ env.VERSION_ALIAS }}
