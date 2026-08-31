@@ -6,7 +6,7 @@ fi
 
 DIRS=()
 for file in $CHANGED_FILES; do
-    DIR=$(echo "$file" | cut -d'/' -f1)
+    DIR=$(echo "$file" | cut -d'/' -f2)
     if [ -d "$DIR" ] && [ -f "$DIR/Dockerfile" ]; then
         DIRS+=("$DIR")
     fi
