@@ -1,4 +1,4 @@
-if [ -z "$TARGETS" ] || [ "$TARGETS" = "all" ]; then
+if [ -n "$TARGETS" ] || [ "$TARGETS" = "all" ]; then
     CHANGED_FILES=$(find . -name Dockerfile)
 else
     CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
