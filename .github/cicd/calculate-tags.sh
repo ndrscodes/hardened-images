@@ -1,4 +1,4 @@
-IMAGE_DIR="${{ matrix.image }}"
+IMAGE_DIR="${ MATRIX_IMAGE }"
 DOCKERFILE="${IMAGE_DIR}/Dockerfile"
 
 UPSTREAM_VER=$(grep -w -E "(FROM )|(COPY --from=)[a-zA-Z0-9/.]*$IMAGE_DIR:\S*" $IMAGE_DIR/Dockerfile | head -n 1 | sed -E 's/.*:([a-zA-Z0-9\._-]+)(@.+)?/\1/g')
