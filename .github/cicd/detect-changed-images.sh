@@ -5,6 +5,7 @@ if [ -n "$TARGET" ]; then
     else 
         CHANGED_FILES=$(find . -name Dockerfile | grep "$TARGET")
     fi
+    CHANGED_FILES=$(echo "$CHANGED_FILES" | sed 's|^\./||g')
 else
     CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r -m $GITHUB_SHA | sed 's|^\./||g')
     echo "changed: $(git diff-tree --no-commit-id --name-only -r -m $GITHUB_SHA | sed 's|^\./||g')" >&2
@@ -12,6 +13,7 @@ fi
 
 DIRS=()
 for file in $CHANGED_FILES; do
+    DIR=$(echo "$file" | cut -d'/' -f1)
     if [ -d "$DIR" ] && [ -f "$DIR/Dockerfile" ]; then
         DIRS+=("$DIR")
     fi
