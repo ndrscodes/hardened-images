@@ -36,5 +36,7 @@ echo "GIT_TAG=${GIT_PREFIX}-r${NEW_REV}" > $GITHUB_ENV
 echo "IMAGE_TAG=${UPSTREAM_VER}-r${NEW_REV}" >> $GITHUB_ENV
 echo "VERSION_ALIAS=${UPSTREAM_VER}" >> $GITHUB_ENV
 
-ARGS=$(cat $SETTINGS_ENV | grep -v "^\w*#" | tr -s '\n' | paste -sd ',' -)
-echo "build_args=$ARGS" >> $GITHUB_OUTPUT
+ARGS=$(cat $SETTINGS_ENV | grep -v "^\w*#")
+echo "build_args<<EOF" >> $GITHUB_OUTPUT
+echo "$ARGS" >> $GITHUB_OUTPUT
+echo "EOF" >> $GITHUB_OUTPUT
