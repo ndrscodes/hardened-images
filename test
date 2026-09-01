@@ -1,7 +1,0 @@
-GIT_TAG=kubeconform/v0.8.0-alpine-r1
-IMAGE_TAG=v0.8.0-alpine-r1
-VERSION_ALIAS=v0.8.0-alpine
-MINOR_ALIAS=v0.8
-GIT_TAG=kubeconform/v0.8.0-alpine-r2
-IMAGE_TAG=v0.8.0-alpine-r2
-VERSION_ALIAS=v0.8.0-alpine
