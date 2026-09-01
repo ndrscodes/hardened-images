@@ -6,8 +6,8 @@ if [ -n "$TARGET" ]; then
         CHANGED_FILES=$(find . -name Dockerfile | grep "$TARGET")
     fi
 else
-    CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | sed 's|^\./||g')
-    echo "changed: $(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | sed 's|^\./||g')" >&2
+    CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r -m $GITHUB_SHA | sed 's|^\./||g')
+    echo "changed: $(git diff-tree --no-commit-id --name-only -r -m $GITHUB_SHA | sed 's|^\./||g')" >&2
 fi
 
 DIRS=()
