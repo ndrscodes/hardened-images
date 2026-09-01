@@ -3,8 +3,10 @@ FROM --platform=$BUILDPLATFORM golang:1.27.0-alpine@sha256:4c9fe60190a2a3350ddc5
 ARG GIT_TAG
 ARG TARGETOS
 ARG TARGETARCH
+# renovate: datasource=go depName=github.com/goreleaser/goreleaser
+ARG GORELEASER_VERSION=v2.18.0
 
-RUN go install github.com/goreleaser/goreleaser/v2@v2.18.0 \
+RUN go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION} \
   && apk add --no-cache git
 
 RUN git clone --depth 1 --branch ${GIT_TAG} https://github.com/yannh/kubeconform.git \

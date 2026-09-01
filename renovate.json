@@ -7,7 +7,8 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "*/settings.env"
+        "*/settings.env",
+        "*/Dockerfile"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s*\\S+=(?<currentValue>\\S+)"
