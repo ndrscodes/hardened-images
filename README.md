@@ -12,13 +12,18 @@ The repository currently contains:
   - Source directory: `kubeconform/`
   - Hardened runtime image built on Alpine
   - Runs as a non-root user and includes CA certificates
+- openapi2jsonschema
+  - Source directory: `openapi2jsonschema/`
+  - Based on python-alpine
+  - Runs as a non-root user
+  - Based on a (custom fork)[https://github.com/ndrscodes/openapi2jsonschema/] of openapi2jsonschema with up-to-date python dependencies
 
 ## Where the images are published
 
 Images are published to GitHub Container Registry (GHCR):
 
-- GHCR image name: `ghcr.io/ndrscodes/hardened-images/kubeconform`
-- GHCR package page: https://github.com/ndrscodes/hardened-images/pkgs/container/hardened-images%2Fkubeconform
+- GHCR image name: `ghcr.io/ndrscodes/hardened-images/<image>`
+- GHCR package page: https://github.com/ndrscodes/hardened-images/pkgs/container/hardened-images
 
 Examples:
 
