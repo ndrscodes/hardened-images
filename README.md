@@ -16,7 +16,7 @@ The repository currently contains:
   - Source directory: `openapi2jsonschema/`
   - Based on python-alpine
   - Runs as a non-root user
-  - Based on a (custom fork)[https://github.com/ndrscodes/openapi2jsonschema/] of openapi2jsonschema with up-to-date python dependencies
+  - Based on a [custom fork](https://github.com/ndrscodes/openapi2jsonschema/) of openapi2jsonschema with up-to-date python dependencies
 
 ## Where the images are published
 
