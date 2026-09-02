@@ -84,6 +84,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "${GIT_TAG}" -m "Release ${GIT_TAG}"
           git push origin "${GIT_TAG}"
+        if: ${{ github.event_name != 'pull_request' }}
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
