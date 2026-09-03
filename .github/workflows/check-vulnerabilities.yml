@@ -24,6 +24,7 @@ jobs:
             echo "images=$(.github/cicd/find-images.sh)" >> $GITHUB_OUTPUT
           else
             echo 'images=["${{ inputs.target }}"]' >> $GITHUB_OUTPUT
+          fi
     outputs:
       images: ${{ steps.find-versions.outputs.images }}
   build:
