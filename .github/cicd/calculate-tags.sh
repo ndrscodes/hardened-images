@@ -29,7 +29,7 @@ if [ -z "$LATEST_TAG" ]; then
     NEW_REV="1"
 else
     CURRENT_REV=$(echo "$LATEST_TAG" | sed -E 's/.*-r([0-9]+)$/\1/')
-    DIFF=$(git diff -U0 HEAD HEAD~1)
+    DIFF=$(git diff -U0 HEAD HEAD~1 -- */*)
     ADDED=$(echo "$DIFF" | grep -E '^\+' | grep -v -E '^\+\+\+' | grep -v -E '^\-\-\-' | sed -E 's/@sha256:[a-f0-9]{64}//' | sed -E 's/^\+//')
     REMOVED=$(echo "$DIFF" | grep -E '^\-' | grep -v -E '^\+\+\+' | grep -v -E '^\-\-\-' | sed -E 's/@sha256:[a-f0-9]{64}//' | sed -E 's/^\-//')
     if [ "$ADDED" = "$REMOVED" ]; then
