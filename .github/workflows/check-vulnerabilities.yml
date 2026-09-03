@@ -2,7 +2,12 @@ name: Trivy Image Scan
 on:
   schedule:
     - cron: "0 7 * * *"
-
+  workflow_dispatch: 
+    inputs:
+      target:
+        required: false
+        type: string
+        default: "all"
 jobs:
   setup:
     name: Setup
@@ -15,7 +20,10 @@ jobs:
       - name: Find latest versions
         id: find-versions          
         run: |
-          echo "images=$(.github/cicd/find-images.sh)" >> $GITHUB_OUTPUT
+          if [ -z "${{ inputs.target }}" ] || [ "${{ inputs.target }}" = "all" ]; then
+            echo "images=$(.github/cicd/find-images.sh)" >> $GITHUB_OUTPUT
+          else
+            echo 'images=["${{ inputs.target }}"]' >> $GITHUB_OUTPUT
     outputs:
       images: ${{ steps.find-versions.outputs.images }}
   build:
