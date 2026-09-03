@@ -29,7 +29,16 @@ if [ -z "$LATEST_TAG" ]; then
     NEW_REV="1"
 else
     CURRENT_REV=$(echo "$LATEST_TAG" | sed -E 's/.*-r([0-9]+)$/\1/')
-    NEW_REV=$((CURRENT_REV + 1))
+    DIFF=$(git diff -U0 HEAD HEAD~1)
+    ADDED=$(echo "$DIFF" | grep -E '^\+' | grep -v -E '^\+\+\+' | grep -v -E '^\-\-\-' | sed -E 's/@sha256:[a-f0-9]{64}//' | sed -E 's/^\+//')
+    REMOVED=$(echo "$DIFF" | grep -E '^\-' | grep -v -E '^\+\+\+' | grep -v -E '^\-\-\-' | sed -E 's/@sha256:[a-f0-9]{64}//' | sed -E 's/^\-//')
+    if [ "$ADDED" = "$REMOVED" ]; then
+        echo "not updating revision since only image digests have changed."
+        NEW_REV=$CURRENT_REV
+    else
+        echo "updating revision"
+        NEW_REV=$((CURRENT_REV + 1))
+    fi
 fi
 
 echo "GIT_TAG=${GIT_PREFIX}-r${NEW_REV}" > $GITHUB_ENV
