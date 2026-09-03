@@ -7,8 +7,8 @@ if [ -n "$TARGET" ]; then
     fi
     CHANGED_FILES=$(echo "$CHANGED_FILES" | sed 's|^\./||g')
 else
-    CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | sed 's|^\./||g')
-    echo "changed: $(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | sed 's|^\./||g')" >&2
+    CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD^1 HEAD | sed 's|^\./||g')
+    echo "changed: $(git diff-tree --no-commit-id --name-only -r HEAD^1 HEAD | sed 's|^\./||g')" >&2
 fi
 
 DIRS=()
