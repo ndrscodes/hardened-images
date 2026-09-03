@@ -5,7 +5,7 @@ PREFIXES=$(echo "$TAGS" | sed -E 's/-r[0-9]+$//' | uniq)
 IMAGES=()
 
 for i in $PREFIXES; do
-    LATEST="$(echo "$TAGS" | grep "$i" | sort -V | tail -n 1)"
+    LATEST="$(echo "$TAGS" | grep "$i" | sort -V | tail -n 1 | sed 's|/|:|')"
     IMAGES+=("$LATEST")
 done
 
