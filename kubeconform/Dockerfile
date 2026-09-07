@@ -4,7 +4,7 @@ ARG GIT_TAG
 ARG TARGETOS
 ARG TARGETARCH
 # renovate: datasource=go depName=github.com/goreleaser/goreleaser
-ARG GORELEASER_VERSION=v2.18.0
+ARG GORELEASER_VERSION=v2.18.1
 
 RUN go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION} \
   && apk add --no-cache git
