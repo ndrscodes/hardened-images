@@ -19,7 +19,7 @@ RUN git clone --depth 1 --branch ${GIT_TAG} https://github.com/yannh/kubeconform
 
 RUN wget -O /kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl" \
   && wget -O /kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl.sha256" \
-  && echo "$(cat kubectl.sha256) /kubectl" | sha256sum --check \
+  && echo "$(cat /kubectl.sha256) /kubectl" | sha256sum --check \
   && chmod u+x /kubectl
 
 FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
