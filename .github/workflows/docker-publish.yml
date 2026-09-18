@@ -95,7 +95,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ${{ env.REGISTRY }}/ndrscodes/hardened-images/${{ matrix.image }}
+          images: ${{ env.REGISTRY }}/ndrscodes/hardened-images/${{ env.IMAGE_NAME }}
           labels: |
             org.opencontainers.image.title=${{ matrix.image }}
             org.opencontainers.image.source=https://github.com/ndrscodes/hardened-images
