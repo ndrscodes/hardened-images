@@ -6,7 +6,7 @@ ARG TARGETARCH
 # renovate: datasource=go depName=github.com/goreleaser/goreleaser
 ARG GORELEASER_VERSION=v2.18.2
 # renovate: datasource=github-tags depName=kubernetes/kubernetes
-ARG KUBECTL_VERSION=v1.37.0
+ARG KUBECTL_VERSION=v1.37.1
 
 RUN go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION} \
   && apk add --no-cache git
