@@ -4,7 +4,7 @@ ARG GIT_TAG
 ARG TARGETOS
 ARG TARGETARCH
 # renovate: datasource=go depName=github.com/goreleaser/goreleaser
-ARG GORELEASER_VERSION=v2.18.3
+ARG GORELEASER_VERSION=v2.19.0
 # renovate: datasource=github-tags depName=kubernetes/kubernetes
 ARG KUBECTL_VERSION=v1.37.1
 
