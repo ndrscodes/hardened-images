@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM python:3.15.2-alpine3.24@sha256:20a82dbc2783112ddb91d1534603f802d222a3e63e593cd002eb2ac534e70211 AS builder
+FROM --platform=$BUILDPLATFORM python:3.15.2-alpine3.24@sha256:a0f2e268f2ce8f3709611a90054ec6a8ae31f6251f5896b8648b9bb99835e30a AS builder
 
 ARG GIT_TAG
 
@@ -10,7 +10,7 @@ RUN git clone --depth 1 --branch ${GIT_TAG} https://github.com/ndrscodes/openapi
     && python -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt .
 
-FROM --platform=$BUILDPLATFORM python:3.15.2-alpine3.24@sha256:20a82dbc2783112ddb91d1534603f802d222a3e63e593cd002eb2ac534e70211
+FROM --platform=$BUILDPLATFORM python:3.15.2-alpine3.24@sha256:a0f2e268f2ce8f3709611a90054ec6a8ae31f6251f5896b8648b9bb99835e30a
 
 COPY --from=builder /opt/venv /opt/venv
 
