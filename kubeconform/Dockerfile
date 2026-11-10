@@ -9,7 +9,7 @@ ARG GORELEASER_VERSION=v2.20.0
 RUN go install github.com/goreleaser/goreleaser/v2@${GORELEASER_VERSION} \
   && apk add --no-cache git
 
-RUN git clone --depth 1 --branch ${GIT_TAG} https://github.com/yannh/kubeconform.git \
+RUN git clone --depth 1 --branch ${GIT_TAG} https://github.com/ndrscodes/kubeconform.git \
   && cd kubeconform \
   && goreleaser build --clean \
   && cp dist/kubeconform_${TARGETOS}_${TARGETARCH}_*/kubeconform /kubeconform \
